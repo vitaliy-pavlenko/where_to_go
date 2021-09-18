@@ -1,36 +1,28 @@
 from django.shortcuts import render
 
+from places.models import Place
+
 
 def index(request):
-    places = {
-      "type": "FeatureCollection",
-      "features": [
-        {
-          "type": "Feature",
-          "geometry": {
-            "type": "Point",
-            "coordinates": [37.62, 55.793676]
-          },
-          "properties": {
-            "title": "«Легенды Москвы",
-            "placeId": "moscow_legends",
-            "detailsUrl": "https://raw.githubusercontent.com/devmanorg/where-to-go-frontend/master/places/moscow_legends.json"
-          }
-        },
-        {
-          "type": "Feature",
-          "geometry": {
-            "type": "Point",
-            "coordinates": [37.64, 55.753676]
-          },
-          "properties": {
-            "title": "Крыши24.рф",
-            "placeId": "roofs24",
-            "detailsUrl": "https://raw.githubusercontent.com/devmanorg/where-to-go-frontend/master/places/roofs24.json"
-          }
-        }
-      ]
+    features = []
+    places = Place.objects.all()
+    for place in places:
+        features.append({
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [place.lng, place.lat],
+            },
+            "properties": {
+                "title": place.title_short,
+                "placeId": place.place_id,
+                "detailsUrl": "https://raw.githubusercontent.com/devmanorg/where-to-go-frontend/master/places/moscow_legends.json"
+            }
+        })
+    data = {
+        "type": "FeatureCollection",
+        "features": features,
     }
     return render(request, 'index.html', {
-        'places_geojson': places
+        'places_geojson': data
     })
