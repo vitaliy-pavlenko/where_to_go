@@ -15,7 +15,7 @@ class Place(models.Model):
 
 
 class PlaceImage(models.Model):
-    place = models.ForeignKey(Place, on_delete=models.CASCADE, verbose_name='Место')
+    place = models.ForeignKey(Place, on_delete=models.CASCADE, related_name='image', verbose_name='Место')
     image = models.ImageField('Изображение')
     position = models.IntegerField('Порядок следования')
 
