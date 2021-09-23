@@ -33,6 +33,13 @@ python manage.py runserver 8000
 ```
 Откройте сайт в браузере по адресу [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 
+## Загрузка данных
+Для загрузки данных о месте выполните команду:
+```
+python manage.py load_place http://адрес/файла.json
+```
+#### Примеры файлов с данными доступны по ссылке: [Данные](https://github.com/devmanorg/where-to-go-places/tree/master)
+
 ## Демо-версия
 
 Демо-версия сайта доступна по ссылке: [Куда пойти - Москва глазами Артема](https://vpavlenko.pythonanywhere.com/)

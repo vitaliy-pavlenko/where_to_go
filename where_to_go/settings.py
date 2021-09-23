@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
+import logging
 import os
 
 from environs import Env
@@ -131,3 +132,31 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'standard': {
+                'format': (
+                    '%(levelname)s '
+                    '[%(name)s:%(lineno)s %(funcName)s] '
+                    '%(message)s'
+                )
+            }
+        },
+        'handlers': {
+            'console': {
+                'level': logging.INFO,
+                'class': 'logging.StreamHandler',
+                'formatter': 'standard',
+            },
+        },
+        'loggers': {
+            '': {
+                'handlers': ['console'],
+                'propagate': True,
+                'level': logging.WARNING,
+            },
+        }
+    }
