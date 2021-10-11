@@ -23,33 +23,39 @@ class Command(BaseCommand):
         try:
             response = requests.get(resource_url)
             response.raise_for_status()
-            place_data = response.json()
-            place, created = Place.objects.get_or_create(
-                title=place_data['title'],
-                short_title=place_data['title'],
-                short_description=place_data['short_description'],
-                long_description=place_data['long_description'],
-                lng=place_data['coordinates']['lng'],
-                lat=place_data['coordinates']['lat'],
-                place_id=place_data['title'],
-            )
-            for i, img_url in enumerate(place_data['imgs']):
-                try:
-                    index = i + 1
-                    img_response = requests.get(img_url)
-                    img = BytesIO(img_response.content)
-                    place_image, img_created = PlaceImage.objects.get_or_create(
-                        place=place,
-                        position=index
-                    )
-                    place_image.image.save(f'place-{place.id}-img-{index}', img, save=True)
-                except Exception as e:
-                    logger.error(f'UNABLE TO SAVE IMAGE FROM FROM RESOURCE {img_url}, details: {e}')
-
-            action = 'CREATED' if created else 'UPDATED'
-            logger.info(f'{action} PLACE {place}')
-
-        except Exception as e:
+        except requests.exceptions.HTTPError as e:
             logger.error(f'UNABLE TO LOAD DATA FROM RESOURCE {resource_url}, details: {e}')
+            return
+
+        place_data = response.json()
+        place, created = Place.objects.get_or_create(
+            title=place_data['title'],
+            defaults={
+                'short_title': place_data['title'],
+                'short_description': place_data['short_description'],
+                'long_description': place_data['long_description'],
+                'lng': place_data['coordinates']['lng'],
+                'lat': place_data['coordinates']['lat'],
+                'place_id': place_data['title'],
+            }
+        )
+        if created:
+            for i, img_url in enumerate(place_data['imgs'], start=1):
+                try:
+                    img_response = requests.get(img_url)
+                    img_response.raise_for_status()
+                except requests.exceptions.HTTPError as e:
+                    logger.error(f'UNABLE TO SAVE IMAGE FROM FROM RESOURCE {img_url}, details: {e}')
+                    continue
+
+                img = BytesIO(img_response.content)
+                place_image, img_created = PlaceImage.objects.get_or_create(
+                    place=place,
+                    position=i
+                )
+                place_image.image.save(f'place-{place.id}-img-{i}', img, save=True)
+
+        action = 'CREATED' if created else 'UPDATED'
+        logger.info(f'{action} PLACE {place}')
 
         logger.info(f'END LOADING DATA FROM RESOURCE {resource_url}')
