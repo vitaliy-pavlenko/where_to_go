@@ -32,7 +32,7 @@ def index(request):
 
 def place_detail(request, id):
     place = get_object_or_404(Place, pk=id)
-    imgs = [img.image.url for img in place.image.all()]
+    imgs = [img.image.url for img in place.images.all()]
     data = {
         'title': place.title,
         'imgs': imgs,
