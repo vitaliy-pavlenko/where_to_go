@@ -32,8 +32,8 @@ class Command(BaseCommand):
             title=place_data['title'],
             defaults={
                 'short_title': place_data['title'],
-                'short_description': place_data['short_description'],
-                'long_description': place_data['long_description'],
+                'short_description': place_data['description_short'],
+                'long_description': place_data['description_long'],
                 'lng': place_data['coordinates']['lng'],
                 'lat': place_data['coordinates']['lat'],
                 'place_id': place_data['title'],
